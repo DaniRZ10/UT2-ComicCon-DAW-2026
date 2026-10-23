@@ -23,6 +23,44 @@ $catalogoTalleres = [
     'rol' => ['nombre' => 'Zona de Rol en Vivo', 'precio' => 5],
 ];
 
+/**
+ * Calcula el precio base asociado a un tipo de entrada.
+ * Lanza Exception si el tipo recibido no es válido.
+ */
+function calcularPrecioBase(string $tipo): int
+{
+    switch ($tipo) {
+        case 'General':
+            return 30;
+        case 'VIP':
+            return 60;
+        case 'Infantil':
+            return 10;
+        default:
+            throw new Exception("El tipo de entrada seleccionado no es válido");
+    }
+}
+
+/**
+ * Procesa la inscripción sumando el precio base y los talleres elegidos.
+ * Lanza Exception si el tipo de entrada o algún taller seleccionado no existe.
+ */
+function procesarInscripcion(string $tipo, array $talleresSeleccionados, array $catalogoTalleres): int
+{
+    // Todos los datos llegan por parámetro sin depender de 'global'.
+    // $total es una variable local que se destruye al salir de la función.
+    $total = calcularPrecioBase($tipo);
+
+    foreach ($talleresSeleccionados as $clave) {
+        if (!isset($catalogoTalleres[$clave])) {
+            throw new Exception("Se ha seleccionado un taller que no existe");
+        }
+        $total += $catalogoTalleres[$clave]['precio'];
+    }
+
+    return $total;
+}
+
 // Variables de resultado inicializadas en ámbito global para que el HTML
 // pueda usarlas de forma segura siempre, se haya enviado el formulario o no.
 $nombre = '';
