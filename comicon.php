@@ -48,11 +48,61 @@ $error = null;
             margin: 40px auto;
             padding: 0 20px;
         }
+
+        .campo {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 
 <body>
     <h1>Comic-Con DAW 2026</h1>
+
+    <form action="comicon.php" method="post">
+        <!-- Campo: Nombre completo -->
+        <div class="campo">
+            <label for="nombre">Nombre completo:</label>
+            <!-- $nombre se pinta directamente sin volver a escapar porque ya llegará saneado con htmlspecialchars -->
+            <input type="text" id="nombre" name="nombre" required value="<?= $nombre ?>">
+        </div>
+
+        <!-- Campo: Edad -->
+        <div class="campo">
+            <label for="edad">Edad:</label>
+            <input type="number" id="edad" name="edad" min="1" step="1" required
+                value="<?= htmlspecialchars($edadTexto, ENT_QUOTES, 'UTF-8') ?>">
+        </div>
+
+        <!-- Campo: Tipo de entrada -->
+        <div class="campo">
+            <label for="tipo">Tipo de entrada:</label>
+            <select id="tipo" name="tipo">
+                <?php foreach ($tiposEntrada as $clave => $texto): ?>
+                    <option value="<?= $clave ?>" <?= $tipo === $clave ? 'selected' : '' ?>>
+                        <?= $texto ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <!-- Campo: Talleres especiales (name="talleres[]" hace que PHP reciba los marcados como array) -->
+        <fieldset class="campo">
+            <legend>Talleres especiales</legend>
+            <?php foreach ($catalogoTalleres as $clave => $taller): ?>
+                <label>
+                    <input type="checkbox" name="talleres[]" value="<?= $clave ?>" <?= in_array($clave, $talleresSeleccionados, true) ? 'checked' : '' ?>>
+                    <?= $taller['nombre'] ?> (<?= $taller['precio'] ?> €)
+                </label>
+            <?php endforeach; ?>
+        </fieldset>
+
+        <button type="submit">Inscribirme</button>
+    </form>
 </body>
 
 </html>
