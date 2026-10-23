@@ -1,6 +1,8 @@
 <?php
 /**
- * Comic-Con DAW 2026 - Script base de inscripción y gestión del evento.
+ * Comic-Con DAW 2026 - Inscripción en un único archivo:
+ * muestra el formulario, valida los datos enviados por POST,
+ * calcula el precio final y muestra el resguardo.
  */
 
 declare(strict_types=1);
