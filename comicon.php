@@ -142,6 +142,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 10px 15px;
             border-radius: 4px;
         }
+
+        .resguardo {
+            border: 2px dashed #333;
+            padding: 15px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -192,6 +198,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit">Inscribirme</button>
     </form>
+
+    <?php if ($exito): ?>
+        <!-- Resguardo generado tras procesar la inscripción con éxito -->
+        <div class="resguardo">
+            <h2>Resguardo de inscripción</h2>
+            <p>Asistente: <?= $nombre ?></p>
+            <p>Entrada: <?= $tipo ?> (<?= $precioBase ?> €)</p>
+            <p>Talleres:</p>
+            <?php if (count($talleresSeleccionados) > 0): ?>
+                <ul>
+                    <?php foreach ($talleresSeleccionados as $clave): ?>
+                        <li><?= $catalogoTalleres[$clave]['nombre'] ?>: <?= $catalogoTalleres[$clave]['precio'] ?> €</li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <p>Ningún taller seleccionado.</p>
+            <?php endif; ?>
+            <p>Total a pagar: <strong><?= $precioTotal ?> €</strong></p>
+        </div>
+    <?php endif; ?>
 </body>
 
 </html>
