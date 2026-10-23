@@ -71,6 +71,46 @@ $precioBase = 0;
 $precioTotal = 0;
 $exito = false;
 $error = null;
+
+// Procesamiento del formulario al enviar por POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        // El operador ?? evita warnings si alguna clave no está definida (ej. ningún taller marcado)
+        // Saneamiento con htmlspecialchars contra XSS
+        $nombre = htmlspecialchars(trim($_POST['nombre'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $edadTexto = trim($_POST['edad'] ?? '');
+        $tipo = $_POST['tipo'] ?? '';
+        $talleresSeleccionados = $_POST['talleres'] ?? [];
+
+        // Los checkboxes marcados llegan como array; si no lo es, se inicializa como array vacío
+        if (!is_array($talleresSeleccionados)) {
+            $talleresSeleccionados = [];
+        }
+
+        // Devuelve false si no es un número entero positivo
+        $edad = filter_var($edadTexto, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+        // Validación con if / elseif / else
+        if ($nombre === '') {
+            throw new Exception("El nombre completo es obligatorio");
+        } elseif ($edad === false) {
+            throw new Exception("La edad debe ser un número entero positivo");
+        } elseif ($edad < 18 && $tipo === 'VIP') {
+            throw new Exception("La entrada VIP está restringida a mayores de edad");
+        } elseif ($edad > 16 && $tipo === 'Infantil') {
+            throw new Exception("La entrada Infantil está restringida a menores de 17 años");
+        } else {
+            $precioBase = calcularPrecioBase($tipo);
+            $precioTotal = procesarInscripcion($tipo, $talleresSeleccionados, $catalogoTalleres);
+            $exito = true;
+        }
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    } finally {
+        // Se ejecuta siempre y deja registro interno en el servidor
+        error_log("[" . date('Y-m-d H:i:s') . "] Inscripción Comic-Con procesada: " . ($exito ? "ÉXITO" : "FALLO"));
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -95,11 +135,22 @@ $error = null;
             display: block;
             margin-bottom: 5px;
         }
+
+        .error {
+            background-color: #fde8e8;
+            color: #9b1c1c;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 
 <body>
     <h1>Comic-Con DAW 2026</h1>
+
+    <?php if ($error !== null): ?>
+        <p class="error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></p>
+    <?php endif; ?>
 
     <form action="comicon.php" method="post">
         <!-- Campo: Nombre completo -->
